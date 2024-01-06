@@ -17,7 +17,7 @@ export default function App() {
         <Stack.Screen
           name="ChatPage"
           component={ChatPage}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

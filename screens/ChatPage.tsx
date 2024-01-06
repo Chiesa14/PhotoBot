@@ -1,23 +1,37 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { Text, View, Image, TouchableOpacity } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  BackHandler,
+  ToastAndroid,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Audio } from "expo-av";
+import { SIZES } from "../constants";
+import styles from "./chatPage.styles";
 
 const ChatPage = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [audioUri, setAudioUri] = useState<string | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
+  //   const [backPressedOnce, setBackPressedOnce] = useState(false);
+  const backPressedOnceRef = useRef(false);
 
   useEffect(() => {
     fetchData();
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
     return () => {
-      // Clean up resources
-      if (sound) {
-        sound.unloadAsync();
-      }
+      backHandler.remove();
     };
-  }, []);
+  }, [sound]);
 
   const fetchData = async () => {
     try {
@@ -26,39 +40,40 @@ const ChatPage = () => {
 
       setImageUri(storedImageData);
       setAudioUri(storedAudioData);
+
       if (storedAudioData !== null) {
         const audioData = JSON.parse(storedAudioData);
-        setAudioUri(audioData.file);
+        setAudioUri(audioData);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const playAudio = async () => {
-    try {
-      if (audioUri) {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: audioUri },
-          { shouldPlay: true }
-        );
-        setSound(sound);
-      }
-    } catch (error) {
-      console.error("Error playing audio:", error);
+  const onBackPress = () => {
+    if (backPressedOnceRef.current) {
+      console.log(backPressedOnceRef.current);
+      BackHandler.exitApp();
+      return true;
+    } else {
+      ToastAndroid.show("Press back again to exit", ToastAndroid.SHORT);
+      backPressedOnceRef.current = true;
+
+      setTimeout(() => {
+        backPressedOnceRef.current = false;
+      }, 1000);
     }
+
+    return true;
   };
 
   return (
-    <SafeAreaView>
-      <Text>Chat Page</Text>
+    <SafeAreaView style={styles.container}>
       {imageUri && (
-        <Image style={{ width: 200, height: 200 }} source={{ uri: imageUri }} />
-      )}
-      {audioUri && (
-        <TouchableOpacity onPress={playAudio} style={{ marginTop: 20 }}>
-          <Text>Play Audio</Text>
-        </TouchableOpacity>
+        <Image
+          style={{ height: SIZES.height / 2 }}
+          source={{ uri: imageUri }}
+        />
       )}
     </SafeAreaView>
   );
