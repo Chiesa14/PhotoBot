@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./home.styles";
 import { AudioUpload, ImageUpload } from "../components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { View } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 
 const Home = () => {
+  const [dataAvailable, setDataAvailable] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -35,17 +36,40 @@ const Home = () => {
         } else {
           navigation.navigate("ChatPage" as never);
         }
+        return true;
       }
     } catch (e) {
       console.error("Error checking/retrieving data:", e);
     }
   };
 
+  const chechData = async () => {
+    try {
+      const storedImageData = await AsyncStorage.getItem("imageData");
+      const storedAudioData = await AsyncStorage.getItem("audioData");
+      if (storedAudioData && storedImageData) setDataAvailable(true);
+      else setDataAvailable(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  setInterval(() => {
+    chechData();
+  }, 100);
+
   return (
     <SafeAreaView style={styles.container}>
-      <View></View>
       <ImageUpload />
       <AudioUpload />
+      {dataAvailable && (
+        <TouchableOpacity
+          style={styles.nextBtn}
+          activeOpacity={0.6}
+          onPress={() => navigation.navigate("ChatPage" as never)}
+        >
+          <Text style={styles.nextBtnText}>Next</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };
