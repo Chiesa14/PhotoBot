@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { styles } from "./audioUpload.styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface RecordingData {
   sound: Audio.Sound | null;
@@ -48,7 +49,16 @@ const AudioUpload: React.FC = () => {
           file: recording?.getURI() || null,
         };
         setRecordings([newRecording]);
+        saveAudioData(newRecording);
       }
+    }
+  };
+  const saveAudioData = async (recordingData: RecordingData) => {
+    try {
+      await AsyncStorage.setItem("audioData", JSON.stringify(recordingData));
+      await AsyncStorage.setItem("timestamp", new Date().getTime().toString());
+    } catch (e) {
+      console.error("Error saving audio data:", e);
     }
   };
   const getRecordingLines = () => {
@@ -92,8 +102,9 @@ const AudioUpload: React.FC = () => {
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  const clearRecord = () => {
+  const clearRecord = async () => {
     recordings[0].sound?.stopAsync();
+    await AsyncStorage.removeItem("audioData");
     setPlaying(false);
     setRecordings([]);
   };
