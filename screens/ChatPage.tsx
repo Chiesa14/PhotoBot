@@ -37,16 +37,12 @@ const ChatPage = () => {
 
   const playAudio = async () => {
     try {
-      console.log("Audio URI:", audioUri);
-      console.log(typeof audioUri);
-
       if (audioUri) {
         const { sound } = await Audio.Sound.createAsync(
           { uri: audioUri },
           { shouldPlay: true }
         );
         setSound(sound);
-        console.log(sound);
       }
     } catch (error) {
       console.error("Error playing audio:", error);
