@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Audio } from "expo-av";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { styles } from "./audioUpload.styles";
 
 interface RecordingData {
@@ -13,9 +13,11 @@ interface RecordingData {
 const AudioUpload: React.FC = () => {
   const [recording, setRecording] = useState<Audio.Recording | undefined>();
   const [recordings, setRecordings] = useState<RecordingData[]>([]);
+  const [playing, setPlaying] = useState(false);
 
   const startRecording = async () => {
     try {
+      setPlaying(false);
       const perm = await Audio.requestPermissionsAsync();
       if (perm.status === "granted") {
         await Audio.setAudioModeAsync({
@@ -28,7 +30,7 @@ const AudioUpload: React.FC = () => {
         setRecording(recording);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -51,13 +53,32 @@ const AudioUpload: React.FC = () => {
   };
   const getRecordingLines = () => {
     return recordings.map((recordline, index) => {
+      const [minutes, seconds] = recordline.duration.split(":").map(Number);
+      const totaltime = minutes * 60 + seconds;
+      const playAudio = () => {
+        recordline.sound?.playAsync();
+        setPlaying(true);
+      };
+      const pauseAudio = () => {
+        recordline.sound?.pauseAsync();
+        setPlaying(false);
+      };
+
       return (
         <View key={index}>
-          <Text>
-            AUdio Recorder| {recordline.duration}
-          </Text>
+          <Text>Audio Recorder</Text>
+          <Text>{recordline.duration}</Text>
+          {playing ? (
+            <TouchableOpacity onPress={pauseAudio}>
+              <FontAwesome name="pause" size={32} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={playAudio}>
+              <FontAwesome name="play" size={32} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={clearRecord} activeOpacity={0.6}>
-            <Ionicons name="close" />
+            <Ionicons name="close" size={32} />
           </TouchableOpacity>
         </View>
       );
@@ -72,6 +93,8 @@ const AudioUpload: React.FC = () => {
   };
 
   const clearRecord = () => {
+    recordings[0].sound?.stopAsync();
+    setPlaying(false);
     setRecordings([]);
   };
 
