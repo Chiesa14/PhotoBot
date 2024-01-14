@@ -8,6 +8,7 @@ import {
   BackHandler,
   ToastAndroid,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Audio } from "expo-av";
 import { SIZES } from "../constants";
@@ -17,7 +18,6 @@ const ChatPage = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [audioUri, setAudioUri] = useState<string | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
-  //   const [backPressedOnce, setBackPressedOnce] = useState(false);
   const backPressedOnceRef = useRef(false);
 
   useEffect(() => {
@@ -52,7 +52,6 @@ const ChatPage = () => {
 
   const onBackPress = () => {
     if (backPressedOnceRef.current) {
-      console.log(backPressedOnceRef.current);
       BackHandler.exitApp();
       return true;
     } else {
@@ -71,10 +70,13 @@ const ChatPage = () => {
     <SafeAreaView style={styles.container}>
       {imageUri && (
         <Image
-          style={{ height: SIZES.height / 2 }}
+          style={{ height: SIZES.height / 2, borderRadius: SIZES.xSmall }}
           source={{ uri: imageUri }}
         />
       )}
+      <TouchableOpacity style={styles.audioIcon}>
+        <FontAwesome name="microphone" size={34} />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

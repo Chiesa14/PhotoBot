@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
   container: {
     padding: 4,
     justifyContent: "center",
-    height: SIZES.height,
+    height: "100%",
   },
   welcomeText: {
     fontSize: SIZES.large,
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
     width: SIZES.xxLarge * 2.5,
     height: SIZES.xLarge * 2,
     position: "absolute",
-    bottom: -SIZES.xxLarge,
+    bottom: 4,
     right: 4,
     justifyContent: "center",
     alignItems: "center",

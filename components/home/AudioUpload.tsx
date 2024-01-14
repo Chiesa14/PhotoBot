@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { styles } from "./audioUpload.styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Slider from "@react-native-community/slider";
 
 interface RecordingData {
   sound: Audio.Sound | null;
@@ -15,6 +16,21 @@ const AudioUpload: React.FC = () => {
   const [recording, setRecording] = useState<Audio.Recording | undefined>();
   const [recordings, setRecordings] = useState<RecordingData[]>([]);
   const [playing, setPlaying] = useState(false);
+  const [sliderValue, setSliderValue] = useState(0);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (playing) {
+      intervalId = setInterval(() => {
+        setSliderValue((prevSliderValue) => prevSliderValue + 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [playing]);
 
   const startRecording = async () => {
     try {
@@ -45,7 +61,7 @@ const AudioUpload: React.FC = () => {
         const { durationMillis } = status;
         const newRecording: RecordingData = {
           sound,
-          duration: getDurationFormatted(durationMillis),
+          duration: getDurationFormatted(durationMillis as number),
           file: recording?.getURI() || null,
         };
         setRecordings([newRecording]);
@@ -53,6 +69,7 @@ const AudioUpload: React.FC = () => {
       }
     }
   };
+
   const saveAudioData = async (recordingData: RecordingData) => {
     try {
       await AsyncStorage.setItem("audioData", JSON.stringify(recordingData));
@@ -61,6 +78,7 @@ const AudioUpload: React.FC = () => {
       console.error("Error saving audio data:", e);
     }
   };
+
   const getRecordingLines = () => {
     return recordings.map((recordline, index) => {
       const [minutes, seconds] = recordline.duration.split(":").map(Number);
@@ -73,11 +91,26 @@ const AudioUpload: React.FC = () => {
         recordline.sound?.pauseAsync();
         setPlaying(false);
       };
+      if (sliderValue == totaltime) {
+        recordline.sound?.stopAsync();
+        setPlaying(false);
+        setSliderValue(0);
+      }
 
       return (
         <View key={index}>
           <Text>Audio Recorder</Text>
           <Text>{recordline.duration}</Text>
+          <Text>{sliderValue}</Text>
+          <Slider
+            style={{ width: "100%", height: 40 }}
+            minimumValue={0}
+            maximumValue={totaltime}
+            value={sliderValue}
+            step={1}
+            onValueChange={(value) => setSliderValue(value)}
+            onSlidingComplete={() => console.log("Completed")}
+          />
           {playing ? (
             <TouchableOpacity onPress={pauseAudio}>
               <FontAwesome name="pause" size={32} />
@@ -106,6 +139,7 @@ const AudioUpload: React.FC = () => {
     recordings[0].sound?.stopAsync();
     await AsyncStorage.removeItem("audioData");
     setPlaying(false);
+    setSliderValue(0);
     setRecordings([]);
   };
 
