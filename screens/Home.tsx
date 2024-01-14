@@ -32,7 +32,6 @@ const Home = () => {
           await AsyncStorage.removeItem("imageData");
           await AsyncStorage.removeItem("audioData");
           await AsyncStorage.removeItem("timestamp");
-          console.log("Data deleted due to inactivity.");
         } else {
           navigation.navigate("ChatPage" as never);
         }
@@ -55,7 +54,7 @@ const Home = () => {
   };
   setInterval(() => {
     chechData();
-  }, 100);
+  }, 2000);
 
   return (
     <SafeAreaView style={styles.container}>
