@@ -8,6 +8,7 @@ import {
   Image,
   Animated,
   Easing,
+  ScrollView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -145,11 +146,16 @@ const ChatPage = () => {
           source={{ uri: imageUri }}
         />
       )}
-      <AudioList items={recordings} />
+      <ScrollView style={{ marginBottom: 50, marginTop: 4 }}>
+        <AudioList items={recordings} />
+      </ScrollView>
       {recording === undefined ? (
         <Animated.View
           style={{
             opacity: fadeInAnim,
+            position: "absolute",
+            margin: 4,
+            bottom: 0,
           }}
         >
           <TouchableOpacity

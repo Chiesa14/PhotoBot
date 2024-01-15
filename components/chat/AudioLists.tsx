@@ -15,13 +15,13 @@ interface AudioListProps {
 }
 
 const AudioList = ({ items }: AudioListProps) => {
-  console.log(items[0]?.name);
-
-  return (
-    <ScrollView style={styles.container}>
-      <Text>Audio lists</Text>
-    </ScrollView>
-  );
+  return items.map((recordValue, index) => {
+    return (
+      <View key={index}>
+        <Text>Audio {index + 1}</Text>
+      </View>
+    );
+  });
 };
 
 export default AudioList;
