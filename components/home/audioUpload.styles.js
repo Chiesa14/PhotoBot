@@ -17,4 +17,9 @@ export const styles = StyleSheet.create({
     fontSize: SIZES.large,
     color: COLORS.lightWhite,
   },
+  audioData: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });

@@ -35,6 +35,7 @@ const AudioUpload: React.FC = () => {
   const startRecording = async () => {
     try {
       setPlaying(false);
+      setRecordings([]);
       const perm = await Audio.requestPermissionsAsync();
       if (perm.status === "granted") {
         await Audio.setAudioModeAsync({
@@ -99,30 +100,35 @@ const AudioUpload: React.FC = () => {
 
       return (
         <View key={index}>
-          <Text>Audio Recorder</Text>
-          <Text>{recordline.duration}</Text>
-          <Text>{sliderValue}</Text>
-          <Slider
-            style={{ width: "100%", height: 40 }}
-            minimumValue={0}
-            maximumValue={totaltime}
-            value={sliderValue}
-            step={1}
-            onValueChange={(value) => setSliderValue(value)}
-            onSlidingComplete={() => console.log("Completed")}
-          />
-          {playing ? (
-            <TouchableOpacity onPress={pauseAudio}>
-              <FontAwesome name="pause" size={32} />
+          <View style={styles.audioData}>
+            {playing ? (
+              <TouchableOpacity onPress={pauseAudio}>
+                <FontAwesome name="pause" size={20} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={playAudio}>
+                <FontAwesome name="play" size={20} />
+              </TouchableOpacity>
+            )}
+            <View style={{ width: "90%" }}>
+              <Slider
+                style={{ width: "100%", height: 40 }}
+                minimumValue={0}
+                maximumValue={totaltime}
+                value={sliderValue}
+                step={1}
+                onValueChange={(value) => setSliderValue(value)}
+                onSlidingComplete={() => console.log("Completed")}
+              />
+              <Text style={{ position: "absolute", right: 15, bottom: 4 }}>
+                {recordline.duration}
+              </Text>
+            </View>
+
+            <TouchableOpacity onPress={clearRecord} activeOpacity={0.6}>
+              <Ionicons name="close" size={20} />
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={playAudio}>
-              <FontAwesome name="play" size={32} />
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity onPress={clearRecord} activeOpacity={0.6}>
-            <Ionicons name="close" size={32} />
-          </TouchableOpacity>
+          </View>
         </View>
       );
     });
