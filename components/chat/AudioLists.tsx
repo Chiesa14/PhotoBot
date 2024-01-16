@@ -17,21 +17,38 @@ interface AudioListProps {
 }
 
 const AudioList = ({ items }: AudioListProps) => {
-  const [playing, setPlaying] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
+  const [playing, setPlaying] = useState(false);
 
   return items.map((recordValue, index) => {
     const [minutes, seconds] = recordValue.duration.split(":").map(Number);
     const totaltime = minutes * 60 + seconds;
+    const playAudio = () => {
+      recordValue.sound?.playAsync();
+      setPlaying(true);
+    };
+    const pauseAudio = () => {
+      recordValue.sound?.pauseAsync();
+      setPlaying(false);
+    };
+    if (sliderValue == totaltime) {
+      recordValue.sound?.stopAsync();
+      setPlaying(false);
+      setSliderValue(0);
+    }
     return (
-      <View key={index}>
-        <View>
+      <View key={index} style={styles.container}>
+        <View
+          style={
+            recordValue.name == "user" ? styles.UserAudio : styles.botAudio
+          }
+        >
           {playing ? (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={pauseAudio}>
               <FontAwesome name="pause" size={20} />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={playAudio}>
               <FontAwesome name="play" size={20} />
             </TouchableOpacity>
           )}
@@ -45,9 +62,6 @@ const AudioList = ({ items }: AudioListProps) => {
               onValueChange={(value) => setSliderValue(value)}
               onSlidingComplete={() => console.log("Completed")}
             />
-            <Text style={{ position: "absolute", right: 15, bottom: 4 }}>
-              {recordValue.duration}
-            </Text>
           </View>
         </View>
       </View>

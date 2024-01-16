@@ -30,6 +30,7 @@ const ChatPage = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [recording, setRecording] = useState<Audio.Recording | undefined>();
   const [recordings, setRecordings] = useState<RecordingData[]>([]);
+  const ref = useRef<ScrollView>(null);
 
   const backPressedOnceRef = useRef(false);
   const fadeInAnim = useRef(new Animated.Value(0)).current;
@@ -137,6 +138,7 @@ const ChatPage = () => {
       });
     }
     setRecordings(allRecordings);
+    ref.current?.scrollToEnd();
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -146,7 +148,7 @@ const ChatPage = () => {
           source={{ uri: imageUri }}
         />
       )}
-      <ScrollView style={{ marginBottom: 50, marginTop: 4 }}>
+      <ScrollView ref={ref} style={{ marginBottom: 50, marginTop: 4 }}>
         <AudioList items={recordings} />
       </ScrollView>
       {recording === undefined ? (
