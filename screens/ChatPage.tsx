@@ -173,10 +173,7 @@ const ChatPage = () => {
           <TouchableOpacity style={styles.audioIcon} activeOpacity={0.6}>
             <FontAwesome name="microphone" size={20} />
           </TouchableOpacity>
-          <Image
-            style={{ height: 40 }}
-            source={require("/home/c_i__a/Desktop/studies/React-Native/PhotoBot/assets/record.gif")}
-          />
+          <Image style={{ height: 40 }} source={require("assets/record.gif")} />
           <TouchableOpacity>
             <FontAwesome
               style={{ marginRight: 10 }}
